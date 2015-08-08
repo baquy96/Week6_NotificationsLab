@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -20,15 +21,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 public class DownloaderTaskFragment extends Fragment {
 
+	private static DownloaderTaskFragment downloaderTaskFragment;
+	private static ArrayList<Integer> resourceIDS;
 	private DownloadFinishedListener mCallback;
 	private Context mContext;
+	private AlarmManager mAlarmManager;
+	private PendingIntent pendingIntent;
 	private final int MY_NOTIFICATION_ID = 11151990;
+	private static final long INITIAL_ALARM_DELAY = 60 * 1000L;
 
 	@SuppressWarnings("unused")
 	private static final String TAG = "Lab-Notifications";
@@ -46,10 +53,18 @@ public class DownloaderTaskFragment extends Fragment {
 		// TODO: Retrieve arguments from DownloaderTaskFragment
 		// Prepare them for use with DownloaderTask.
 		Bundle bundle = this.getArguments();
-		ArrayList<Integer> resourceIDS = bundle.getIntegerArrayList(MainActivity.TAG_FRIEND_RES_IDS);
+		resourceIDS = bundle.getIntegerArrayList(MainActivity.TAG_FRIEND_RES_IDS);
 
 		// TODO: Start the DownloaderTask
 		downloads.execute(resourceIDS);
+
+		mAlarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+		Intent receiverIntent = new Intent(mContext, AlarmReceiver.class);
+		pendingIntent = PendingIntent.getBroadcast(mContext, 0, receiverIntent, 0);
+		mAlarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME,
+				SystemClock.elapsedRealtime(),
+				INITIAL_ALARM_DELAY,
+				pendingIntent);
 
 	}
 
@@ -104,6 +119,7 @@ public class DownloaderTaskFragment extends Fragment {
 		protected void onPostExecute(String[] strings) {
 			if (isAdded() && mCallback != null) {
 				mCallback.notifyDataRefreshed(strings);
+
 			}
 		}
 	}
@@ -204,8 +220,8 @@ public class DownloaderTaskFragment extends Fragment {
 								// the
 								// restartMainActivityIntent and set its flags
 								// to FLAG_UPDATE_CURRENT
-								PendingIntent pendingIntent = PendingIntent.getActivity(mContext,MY_NOTIFICATION_ID,
-										restartMainActivityIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+								pendingIntent = PendingIntent.getActivity(mContext, MY_NOTIFICATION_ID,
+										restartMainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 								// Uses R.layout.custom_notification for the
 								// layout of the notification View. The xml
@@ -275,4 +291,13 @@ public class DownloaderTaskFragment extends Fragment {
 				}
 			}
 		}
+	public static class AlarmReceiver extends BroadcastReceiver {
+
+		@Override
+	public void onReceive(Context context, Intent intent) {
+			Log.d(TAG, "Re-download");
+			if (downloaderTaskFragment != null)
+				downloaderTaskFragment.new DownloaderTask().execute(resourceIDS);
+		}
+	}
 }

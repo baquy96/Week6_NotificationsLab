@@ -55,3 +55,7 @@ ADDED from AndroidManifest.xml:25:9
 		ADDED from AndroidManifest.xml:27:13
 	android:name
 		ADDED from AndroidManifest.xml:26:13
+receiver#course.labs.notificationslab.DownloaderTaskFragment$AlarmReceiver
+ADDED from AndroidManifest.xml:34:9
+	android:name
+		ADDED from AndroidManifest.xml:34:19

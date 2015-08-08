@@ -13,13 +13,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -48,12 +51,13 @@ public class MainActivity extends Activity implements SelectionListener,
 	public static final ArrayList<Integer> sRawTextFeedIds = new ArrayList<Integer>(
 			Arrays.asList(R.raw.tswift, R.raw.rblack, R.raw.lgaga));
 
+
 	private FragmentManager mFragmentManager;
 	private FriendsFragment mFriendsFragment;
 	private FeedFragment mFeedFragment;
 	private DownloaderTaskFragment mDownloaderFragment;
 	private boolean mIsInteractionEnabled;
-	private String[] mFormattedFeeds = new String[sRawTextFeedIds.size()];;
+	private String[] mFormattedFeeds = new String[sRawTextFeedIds.size()];
 	private boolean mIsFresh;
 	private BroadcastReceiver mRefreshReceiver;
 	private static final long TWO_MIN = 2 * 60 * 1000;
@@ -63,6 +67,9 @@ public class MainActivity extends Activity implements SelectionListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+
+
 		intentFilter = new IntentFilter();
 		intentFilter.addAction(DATA_REFRESHED_ACTION);
 
@@ -74,7 +81,10 @@ public class MainActivity extends Activity implements SelectionListener,
 		} else {
 			setupFragments();
 		}
+
+
 	}
+
 
 	// One time setup of UI and retained (headless) Fragment
 	private void setupFragments() {
@@ -189,7 +199,7 @@ public class MainActivity extends Activity implements SelectionListener,
 		mIsInteractionEnabled = true;
 		allowUserClicks();
 
-	};
+	}
 
 	// Enable user interaction with FriendFragment
 	private void allowUserClicks() {
