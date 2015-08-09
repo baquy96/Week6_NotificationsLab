@@ -19,6 +19,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -293,11 +294,42 @@ public class DownloaderTaskFragment extends Fragment {
 		}
 	public static class AlarmReceiver extends BroadcastReceiver {
 
+		private final CharSequence tickerText = "Re-download";
+		private final CharSequence contentTitle = "Update";
+		private final CharSequence contentText = "Update completed successfully";
+
+		private final Uri soundURI = Uri
+				.parse("android.resource://course.labs.notificationslab/"
+						+ R.raw.alarm_rooster);
+		private final long[] mVibratePattern = { 0, 200, 200, 300 };
+
 		@Override
 	public void onReceive(Context context, Intent intent) {
 			Log.d(TAG, "Re-download");
 			if (downloaderTaskFragment != null)
 				downloaderTaskFragment.new DownloaderTask().execute(resourceIDS);
+			// The Intent to be used when the user clicks on the Notification View
+			Intent mNotificationIntent = new Intent(context, MainActivity.class);
+			// The PendingIntent that wraps the underlying Intent
+			PendingIntent mContentIntent = PendingIntent.getActivity(context, 0,
+					mNotificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+			// Build the Notification
+			Notification.Builder notificationBuilder = new Notification.Builder(
+					context).setTicker(tickerText)
+					.setSmallIcon(android.R.drawable.stat_sys_warning)
+					.setAutoCancel(true)
+					.setContentText(contentText)
+					.setContentIntent(mContentIntent)
+					.setContentTitle(contentTitle)
+					.setSound(soundURI);
+
+			// Get the NotificationManager
+			NotificationManager mNotificationManager = (NotificationManager) context
+					.getSystemService(Context.NOTIFICATION_SERVICE);
+
+			// Pass the Notification to the NotificationManager:
+			mNotificationManager.notify(0, notificationBuilder.build());
 		}
 	}
 }

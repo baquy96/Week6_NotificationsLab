@@ -35,9 +35,10 @@ public final class R {
         public static final int feed=0x7f030003;
     }
     public static final class raw {
-        public static final int lgaga=0x7f040000;
-        public static final int rblack=0x7f040001;
-        public static final int tswift=0x7f040002;
+        public static final int alarm_rooster=0x7f040000;
+        public static final int lgaga=0x7f040001;
+        public static final int rblack=0x7f040002;
+        public static final int tswift=0x7f040003;
     }
     public static final class string {
         public static final int alert_string=0x7f070000;
